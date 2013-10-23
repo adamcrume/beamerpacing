@@ -1,0 +1,10 @@
+Beamer Pacing v0.1
+==================
+
+This package computes estimated completion times for display on slide
+notes.  This is helpful when using the "show notes on second screen"
+option of Beamer.
+
+To build documentation, just run "make".
+
+This package is designed for LaTeX2e.

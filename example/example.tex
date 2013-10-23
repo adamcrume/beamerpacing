@@ -1,0 +1,56 @@
+% beamerpacing example
+\documentclass{beamer}
+\usepackage[minutes=20]{beamerpacing}
+\usepackage{pgfpages}
+\usepackage{transparent}
+\title[Example]{beamerpacing example}
+\author{John Doe}
+
+\usetheme{Copenhagen}
+
+\setbeamertemplate{note page}[slide with time]
+
+\ifdefined\mybeameropts
+\setbeameroption{\mybeameropts}
+\fi
+
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+(should finish at $.2*20/13.2$=0:18)
+\slideweight{.2}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Topic 1}
+  \slideweight{2}
+  The total weight for all slides in this example is 13.2.
+  This slide should finish at $(.2+2)*20/13.2$ minutes = 3:20.
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Weights on overlays}
+  \begin{itemize}
+  \item<1-> This slide should finish at $(.2+2+1)*20/13.2$ minutes = 4:51.
+  \item<2-> This slide should finish at $(.2+2+1+2)*20/13.2$ minutes = 7:53.
+  \item<3-> This slide should finish at $(.2+2+1+2+3)*20/13.2$ minutes = 12:25.
+  \item<4-> This slide should finish at $(.2+2+1+2+3+4)*20/13.2$ minutes = 18:29.
+  \end{itemize}
+  \only<1>{\slideweight{1}}
+  \only<2>{\slideweight{2}}
+  \only<3>{\slideweight{3}}
+  \only<4>{\slideweight{4}}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Conclusion}
+  This slide should finish at 20:00.
+\end{frame}
+
+
+\end{document}

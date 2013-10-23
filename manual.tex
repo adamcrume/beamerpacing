@@ -1,0 +1,50 @@
+\documentclass{ltxdoc}
+\usepackage{url}
+
+\begin{document}
+
+\changes{0.1}{2013/10/20}{Initial version}
+
+\title{The \textsf{beamerpacing} package}
+\author{Adam Crume \\ \url{adamcrume@gmail.com}}
+\date{0.1 from 2013/10/20}
+
+\maketitle
+
+\section{Introduction}
+
+\texttt{beamerpacing} is used to provide an estimated end time for each slide in a presentation.
+When displayed on an alternate screen, this is useful for keeping an appropriate pacing.
+
+\section{Usage}
+
+\DescribeMacro{\slideweight}
+Sets the weight for the current slide.
+The default weight is 1.
+Weights are typically set like so:
+\begin{verbatim}\begin{frame}
+  Slide content here
+  \slideweight{.75}
+\end{frame}\end{verbatim}
+The exact position of \verb|slideweight| inside the frame is not important.
+
+The weight is per \emph{slide}, not frame, so this can be set separately for each overlay.
+A frame with overlays may set the weights as follows:
+\begin{verbatim}\begin{frame}
+  \begin{itemize}
+    \item This frame
+    \item<2-> has overlays.
+  \end{itemize}
+  \only<1>{\slideweight{1.5}}
+  \only<2>{\slideweight{.75}}
+\end{frame}\end{verbatim}
+Note that using \verb|\slideweight| after \verb|\pause| or within \verb|\item<2->| currently does not work as expected.
+
+\DescribeMacro{\slidefinishtime}
+Inserts the estimated end time of the current slide, in \texttt{mm:ss} format.
+This will usually be called from a \texttt{note page} template.
+
+\DescribeMacro{slide with time}
+This is a simple \texttt{note page} template that overlays the estimated end time on top of the slide contents.
+
+\end{document}

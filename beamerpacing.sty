@@ -1,0 +1,119 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerpacing}[2013/10/20 Beamer Pacing]
+\RequirePackage{kvoptions}
+
+%%%%%%%%%%%%%%%%%%%% Options
+
+\SetupKeyvalOptions{family=beamerpacing,prefix=beamerpacingopts@}
+
+% Length of the presentation, in minutes
+\DeclareStringOption[30]{minutes}
+
+\ProcessKeyvalOptions*
+
+%%%%%%%%%%%%%%%%%%%%% Body
+
+% Total presentation time, in minutes.
+\def\beamerpacing@totaltime{\beamerpacingopts@minutes}
+
+% Total weight of all slides.
+% This should be overwritten by the definition in the .aux file.
+% It's initialized to 1 to prevent divide-by-0 errors.
+\def\beamerpacing@totalweight{1}
+
+% Running sum of the total weight, to be written to the .aux file.
+\def\beamerpacing@newtotalweight{0}
+
+% Weight of the current slide.
+\def\beamerpacing@currentweight{1}
+
+% Estimated end time of the current slide, in minutes.
+\def\beamerpacing@currenttime{0}
+
+% Sets the weight of the current slide.
+% The default weight is 1.
+\newcommand\slideweight[1]{%
+  \xdef\beamerpacing@currentweight{#1}%
+}
+
+% Simple Beamer template for note pages that display the slide with the estimated end time overlayed.
+\defbeamertemplate*{note page}{slide with time}{%
+  \begin{pgfpicture}{0cm}{0cm}{\paperwidth}{\paperheight}%
+    \begin{pgflowlevelscope}{}{%
+        \pgftransformshift{%
+          \pgfpoint{-1cm}{0cm}%
+        }%
+        \pgftransformshift{%
+          \pgfpoint{\beamer@origlmargin}{\footheight}%
+        }%
+        \pgftext[left,bottom]{%
+          \copy\beamer@frameboxcopy%
+        }%
+      }%
+    \end{pgflowlevelscope}%
+  \end{pgfpicture}%
+  %
+  \vskip-\paperheight%
+  \vskip 1em%
+  \nointerlineskip%
+  %%%%%%% Display the finish time of the slide
+  \hfill%
+  \colorbox{white}{%
+    \hbox{%
+      \large%
+      \slidefinishtime%
+    }%
+  }%
+  %%%%%%%
+  \vskip.25em%
+  \nointerlineskip%
+  {%
+    \transparent{.75}%
+    \colorbox{gray!50}{%
+      \vbox{%
+        \insertnote%
+      }%
+    }%
+  }%
+}
+
+% Compute the running total weight at the end of each slide
+\let\beamerpacing@old@beamer@framenotesend\beamer@framenotesend%
+\renewcommand*\beamer@framenotesend{%
+  \beamerpacing@old@beamer@framenotesend%
+  %
+  % Compute the integer minutes and seconds.
+  \pgfmathsetmacro{\beamerpacing@tmp}{%
+    \beamerpacing@currenttime + \beamerpacing@currentweight / \beamerpacing@totalweight * \beamerpacing@totaltime
+  }%
+  \xdef\beamerpacing@currenttime{\beamerpacing@tmp}%
+  \pgfmathparse{floor(\beamerpacing@tmp)}%
+  \pgfmathprintnumberto[fixed,verbatim]{\pgfmathresult}{\beamerpacing@currentminutes}%
+  \pgfmathparse{floor(60 * (\beamerpacing@tmp - \beamerpacing@currentminutes))}%
+  \pgfmathprintnumberto[fixed,verbatim]{\pgfmathresult}{\beamerpacing@currentseconds}%
+  %
+  % Compute the running total weight at the end of each slide.
+  \pgfmathparse{\beamerpacing@newtotalweight + \beamerpacing@currentweight}%
+  \xdef\beamerpacing@newtotalweight{\pgfmathresult}%
+  \gdef\beamerpacing@currentweight{1}%
+  %
+  % Set up the macro to insert the estimated end time of the slide in mm:ss format.
+  \xdef\slidefinishtime{%
+    \ifnum\beamerpacing@currentminutes<10{%
+      0%
+    }\fi%
+    \beamerpacing@currentminutes%
+    :%
+    \ifnum\beamerpacing@currentseconds<10{%
+      0%
+    }\fi%
+    \beamerpacing@currentseconds%
+  }%
+}
+
+% Save the total weight in the .aux file.
+\AtEndDocument{%
+  \immediate\write\@auxout{%
+    \string\gdef\string\beamerpacing@totalweight{\beamerpacing@newtotalweight}%
+  }%
+}
